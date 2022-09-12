@@ -9,12 +9,6 @@ export default function App() {
     getLocalTodos();
   }, []);
 
-  function fetchTodos() {
-    return fetch("https://6317578082797be77ffa2125.mockapi.io/todos")
-      .then((response) => response.json())
-      .then((json) => json.stringify());
-  }
-
   const [todoInput, setTodoInput] = useState("");
   const [todos, setTodos] = useState([]);
   const [filterStatus, setFilterStatus] = useState("all");
@@ -35,6 +29,12 @@ export default function App() {
   };
 
   useEffect(() => {
+    axios
+      .get(`https://6317578082797be77ffa2125.mockapi.io/todos`)
+      .then((res) => {
+        setTodos(res.data);
+      });
+    console.table(setTodos);
     filterTodos();
     saveLocalTodos();
   }, [todos, filterStatus]);
