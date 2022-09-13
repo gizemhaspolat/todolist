@@ -1,6 +1,12 @@
 import Todo from "./Todo";
 
-function TodoList({ todos, setTodos, filteredTodos }) {
+function TodoList({
+  todos,
+  setTodos,
+  filteredTodos,
+  handleDeleteTodo,
+  updateTodos,
+}) {
   return (
     <div className="todo-list">
       <ul className="todo-items">
@@ -8,9 +14,11 @@ function TodoList({ todos, setTodos, filteredTodos }) {
           <Todo
             todos={todos}
             setTodos={setTodos}
-            text={todo.text}
+            text={todo.content}
             key={todo.id}
             todo={todo}
+            handleDeleteTodo={handleDeleteTodo}
+            updateTodos={updateTodos}
           />
         ))}
       </ul>

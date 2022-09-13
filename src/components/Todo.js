@@ -1,24 +1,14 @@
-export default function Todo({ text, todo, todos, setTodos }) {
+export default function Todo({ text, todo, handleDeleteTodo, updateTodos }) {
   const deleteTodo = () => {
-    setTodos(todos.filter((el) => el.id !== todo.id));
+    handleDeleteTodo(todo.id);
   };
   const completeTodo = () => {
-    setTodos(
-      todos.map((item) => {
-        if (item.id === todo.id) {
-          return {
-            ...item,
-            completed: !item.completed,
-          };
-        }
-        return item;
-      })
-    );
+    updateTodos(todo);
   };
 
   return (
     <div className="todo">
-      <li className={`todo-item ${todo.completed ? "completed" : ""}`}>
+      <li className={`todo-item ${todo.isCompleted ? "completed" : ""}`}>
         {text}
       </li>
       <button onClick={completeTodo} className="complete-btn">

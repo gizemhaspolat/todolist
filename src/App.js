@@ -3,55 +3,110 @@ import "./App.css";
 import Form from "./components/Form";
 import TodoList from "./components/TodoList";
 import axios from "axios";
+import nextId from "react-id-generator";
 
 export default function App() {
-  useEffect(() => {
-    getLocalTodos();
-  }, []);
+  const idGenerator = () => {
+    return nextId();
+  };
+  function getTodos() {
+    axios
+      .get("https://6317578082797be77ffa2125.mockapi.io/todos")
+      .then((res) => {
+        setTodos(res.data);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function postTodos(todo) {
+    axios
+      .post("https://6317578082797be77ffa2125.mockapi.io/todos", todo)
+      .then((res) => {
+        setTodos([...todos, res.data]);
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function deleteTodos(id) {
+    axios
+      .delete(`https://6317578082797be77ffa2125.mockapi.io/todos/${id}`)
+      .then((res) => {
+        setTodos(todos.filter((todo) => todo.id !== id));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function updateTodos(todo) {
+    axios
+      .put(`https://6317578082797be77ffa2125.mockapi.io/todos/${todo.id}`, todo)
+      .then((res) => {
+        setTodos(
+          todos.map((item) => {
+            if (item.id === todo.id) {
+              return {
+                ...item,
+                isCompleted: !item.isCompleted,
+              };
+            }
+            return item;
+          })
+        );
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   const [todoInput, setTodoInput] = useState("");
   const [todos, setTodos] = useState([]);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filteredTodos, setFilteredTodos] = useState([]);
 
-  const filterTodos = () => {
+  useEffect(() => {
+    getTodos();
+  }, []);
+
+  useEffect(() => {
+    filterHandler();
+  }, [todos, filterStatus]);
+
+  const filterHandler = () => {
     switch (filterStatus) {
       case "completed":
-        setFilteredTodos(todos.filter((todo) => todo.completed === true));
+        setFilteredTodos(todos.filter((todo) => todo.isCompleted === true));
         break;
       case "uncompleted":
-        setFilteredTodos(todos.filter((todo) => todo.completed === false));
+        setFilteredTodos(todos.filter((todo) => todo.isCompleted === false));
         break;
       default:
         setFilteredTodos(todos);
         break;
     }
+    console.log(filteredTodos);
   };
 
-  useEffect(() => {
-    axios
-      .get(`https://6317578082797be77ffa2125.mockapi.io/todos`)
-      .then((res) => {
-        setTodos(res.data);
-      });
-    console.table(setTodos);
-    filterTodos();
-    saveLocalTodos();
-  }, [todos, filterStatus]);
-
-  const saveLocalTodos = () => {
-    localStorage.setItem("todos", JSON.stringify(todos));
+  const handleSubmitTodo = (e) => {
+    e.preventDefault();
+    postTodos({
+      content: todoInput,
+      isCompleted: false,
+      id: idGenerator(),
+    });
+    setTodoInput("");
   };
 
-  const getLocalTodos = () => {
-    if (localStorage.getItem("todos") === null) {
-      localStorage.setItem("todos", JSON.stringify([]));
-    } else {
-      let todoLocal = JSON.parse(localStorage.getItem("todos"));
-      setTodos(todoLocal);
-    }
+  const handleDeleteTodo = (id) => {
+    deleteTodos(id);
   };
-
   return (
     <div className="App">
       <header>
@@ -60,14 +115,16 @@ export default function App() {
       <Form
         todoInput={todoInput}
         setTodoInput={setTodoInput}
-        todos={todos}
-        setTodos={setTodos}
         setFilterStatus={setFilterStatus}
+        handleSubmitTodo={handleSubmitTodo}
       />
       <TodoList
         todos={todos}
         setTodos={setTodos}
         filteredTodos={filteredTodos}
+        setFilteredTodos={setFilteredTodos}
+        handleDeleteTodo={handleDeleteTodo}
+        updateTodos={updateTodos}
       />
     </div>
   );

@@ -23,10 +23,10 @@ export default function App() {
   const filterTodos = () => {
     switch (filterStatus) {
       case "completed":
-        setFilteredTodos(todos.filter((todo) => todo.completed === true));
+        setFilteredTodos(todos.filter((todo) => todo.isCompleted === true));
         break;
       case "uncompleted":
-        setFilteredTodos(todos.filter((todo) => todo.completed === false));
+        setFilteredTodos(todos.filter((todo) => todo.isCompleted === false));
         break;
       default:
         setFilteredTodos(todos);
